@@ -98,7 +98,7 @@ class SelfAttention(nn.Module):
 
         super().__init__()
         self.k, self.heads = k, heads
-
+        assert k % heads == 0
         self.key = nn.Linear(k, k, bias=False)
         self.query = nn.Linear(k, k, bias=False)
         self.value = nn.Linear(k, k, bias=False)
@@ -112,14 +112,14 @@ class SelfAttention(nn.Module):
 
         x = self.emb(x)
 
-        b, t, k = x.size()
+        b, t, e = x.size()
         h = self.heads
 
         q = self.query(x)
         k = self.key(x)
         v = self.value(x)
 
-        s = k // h
+        s = e // h
 
         k = k.view(b, t, h, s)
         q = q.view(b, t, h, s)
@@ -146,6 +146,7 @@ class SelfAttention(nn.Module):
         out = out.squeeze(2)
         out = self.fc(out)
         return out
+
 
 
 
