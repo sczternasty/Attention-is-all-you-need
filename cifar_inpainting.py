@@ -109,17 +109,14 @@ class Transformer(nn.Module):
         self.heads = heads
         grid_size = img_size // patch_size
 
-        # Embeddings
         self.num_patches = (img_size // patch_size) ** 2
         self.proj = nn.Conv2d(in_channels, emb_size, kernel_size=patch_size, stride=patch_size)
         self.pos_embedding = nn.Parameter(torch.randn(1, self.num_patches, emb_size))
-        
-        # Transformer blocks
+
         self.transformer_blocks = nn.Sequential(
             *[TransformerBlock(emb_size, heads, dropout) for _ in range(num_layers)]
         )
-        
-        # Output projection
+
         self.output_proj = nn.ConvTranspose2d(emb_size, in_channels, kernel_size=patch_size, stride=patch_size)
 
     def forward(self, x):
@@ -156,8 +153,7 @@ def train_model(model, train_loader, num_epochs=10, device='cuda'):
             
             optimizer.zero_grad()
             outputs = model(masked_images)
-            
-            # Extract predicted patches
+
             predicted_patches = torch.zeros_like(targets)
             for i, (x, y) in enumerate(patch_positions):
                 predicted_patches[i] = outputs[i, :, x:x+8, y:y+8]
@@ -217,10 +213,10 @@ def main():
     )
     train_model(model, train_loader, num_epochs=10, device=device)
     
-    # Save the model
+
     torch.save(model.state_dict(), 'cifar_inpainting_model.pth')
     
-    # Evaluate and show examples
+
     print("\nEvaluating model on test set...")
     evaluate_model(model, test_loader, num_examples=5, device=device)
 
