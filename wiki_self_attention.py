@@ -186,7 +186,7 @@ class SelfAttention(nn.Module):
         out = out.transpose(1, 2).contiguous().view(B, T, S * H) # (B, H, T, S) -> (B, T, S * H) -> (B, T, C)
 
         out = self.unify_heads(out)
-
+        [[]]
         return out
 
 class TransformerBlock(nn.Module):
@@ -194,7 +194,6 @@ class TransformerBlock(nn.Module):
     super().__init__()
 
     self.attention = SelfAttention(emb_size, heads)
-    self.
     self.norm1 = nn.LayerNorm(emb_size)
     self.norm2 = nn.LayerNorm(emb_size)
 
