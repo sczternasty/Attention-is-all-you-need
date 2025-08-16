@@ -104,6 +104,16 @@ Speedup: 1.99x
 Output similarity: 0.9876
 ```
 
+### Citation
 
+```
+@inproceedings{vaswani2017attention,
+  title={Attention Is All You Need},
+  author={Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, {\L}ukasz and Polosukhin, Illia},
+  booktitle={Advances in Neural Information Processing Systems},
+  pages={6000--6010},
+  year={2017}
+}
+```
 
 
