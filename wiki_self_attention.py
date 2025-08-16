@@ -1,3 +1,26 @@
+"""
+Wiki Text Generation using Custom Self-Attention Mechanisms
+
+CV-Ready Implementation: Advanced NLP with Text Generation & Language Modeling
+============================================================================
+
+This module demonstrates cutting-edge natural language processing skills by implementing:
+- Custom self-attention mechanisms for text generation
+- Advanced language modeling with compression metrics
+- Efficient sequence processing for large-scale datasets
+- Custom training loops with sophisticated evaluation
+
+Key Technical Skills Demonstrated:
+- Deep understanding of transformer architectures and attention mechanisms
+- Advanced text generation and language modeling techniques
+- Custom PyTorch implementation for complex NLP tasks
+- Research-level implementation of state-of-the-art text generation
+
+CV Category: Natural Language Processing, Text Generation, Language Modeling, Custom Attention
+Author: [Your Name]
+Date: [Current Date]
+"""
+
 import torch
 import torch.nn as nn
 import tqdm
@@ -9,11 +32,18 @@ import os
 import numpy as np
 import gzip
 from torch.optim.lr_scheduler import LambdaLR
+
+# CV Skill: Reproducible Research & Experimentation
 torch.manual_seed(42)
 
 def enwik8(path=None, n_train=int(90e6), n_valid=int(5e6), n_test=int(5e6)):
     """
-    Load the enwik8 dataset from the Hutter challenge.
+    CV Skill: Advanced Data Pipeline & Large-Scale Dataset Handling
+    - Efficient loading of large-scale text datasets
+    - Memory-optimized data processing
+    - Custom dataset splitting and management
+    
+    Load the enwik8 dataset from the Hutter challenge for language modeling.
 
     Adapted from https://github.com/openai/blocksparse/blob/master/examples/transformer/enwik8.py
 

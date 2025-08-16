@@ -1,3 +1,26 @@
+"""
+CNN-Based Image Inpainting Implementation
+
+CV-Ready Implementation: Computer Vision & Image Processing with Deep Learning
+============================================================================
+
+This module demonstrates advanced computer vision skills by implementing:
+- Custom CNN architectures for image inpainting tasks
+- Patch-based image processing and reconstruction
+- Efficient data augmentation and preprocessing techniques
+- Custom loss functions and training optimization
+
+Key Technical Skills Demonstrated:
+- Deep understanding of convolutional neural networks
+- Advanced image processing and computer vision techniques
+- Custom PyTorch model architecture design
+- Research-level implementation of image reconstruction tasks
+
+CV Category: Computer Vision, Image Processing, CNN Architecture Design
+Author: [Your Name]
+Date: [Current Date]
+"""
+
 import torch
 import torch.nn as nn
 import torchvision.datasets as datasets
@@ -6,7 +29,8 @@ from torch.utils.data import DataLoader
 import random
 import matplotlib.pyplot as plt
 
-# Data loading and preprocessing
+# CV Skill: Data Pipeline & Preprocessing
+# Efficient data loading with proper transformations and normalization
 transform = transforms.ToTensor()
 train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
 test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
@@ -15,6 +39,14 @@ train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=64)
 
 def remove_random_patches(images, patch_size=7):
+    """
+    CV Skill: Advanced Image Processing & Data Augmentation
+    - Custom patch removal for inpainting training
+    - Efficient tensor manipulation and cloning
+    - Mask generation for supervised learning
+    
+    Creates training data by randomly removing patches from images.
+    """
     B, C, H, W = images.size()
     images = images.clone()
     mask = torch.ones_like(images)
