@@ -104,6 +104,9 @@ Speedup: 1.99x
 Output similarity: 0.9876
 ```
 
+### Citation
+
+- Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., & Polosukhin, I. (2017). *Attention is all you need*. NeurIPS. [arXiv:1706.03762](https://arxiv.org/abs/1706.03762)
 
 
 
