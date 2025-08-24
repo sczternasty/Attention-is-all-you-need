@@ -22,17 +22,11 @@ class PyTorchAttentionWrapper(nn.Module):
         output, _ = self.attention(query, key, value, attn_mask=mask)
         return output
 
-def generate_test_data(batch_size: int, seq_len: int, d_model: int, 
-                      device: torch.device) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-
-    query = torch.randn(batch_size, seq_len, d_model, device=device)
-    key = torch.randn(batch_size, seq_len, d_model, device=device)
-    value = torch.randn(batch_size, seq_len, d_model, device=device)
-    
+def generate_test_data(batch_size: int, seq_len: int, d_model: int, device: torch.device):
+    X = torch.randn(batch_size, seq_len, d_model, device=device)
     mask = torch.triu(torch.ones(seq_len, seq_len, device=device), diagonal=1).bool()
-    mask = mask.unsqueeze(0).unsqueeze(0)
-    
-    return query, key, value, mask
+    return X, mask
+
 
 def benchmark_attention_models(device: torch.device = 'cuda' if torch.cuda.is_available() else 'cpu') -> Dict:
     print(f"Running benchmarks on device: {device}")
@@ -47,12 +41,12 @@ def benchmark_attention_models(device: torch.device = 'cuda' if torch.cuda.is_av
     
     for config in configs:
         print(f"\nTesting configuration: {config}")
-        
-        query, key, value, mask = generate_test_data(
-            config['batch_size'], config['seq_len'], 
+
+        X, mask = generate_test_data(
+            config['batch_size'], config['seq_len'],
             config['d_model'], device
         )
-        
+
         custom_attention = SelfAttention(
             emb_size=config['d_model'], 
             heads=config['num_heads']
@@ -63,8 +57,8 @@ def benchmark_attention_models(device: torch.device = 'cuda' if torch.cuda.is_av
         
         for _ in range(3):
             with torch.no_grad():
-                _ = custom_attention(query)
-                _ = pytorch_attention(query, key, value, mask)
+                _ = custom_attention(X)
+                _ = pytorch_attention(X, X, X, mask)
         
         torch.cuda.synchronize() if device.type == 'cuda' else None
         start_time = time.time()
@@ -227,12 +221,7 @@ def run_comprehensive_tests():
 if __name__ == "__main__":
     try:
         results = run_comprehensive_tests()
-        print(f"\nSummary:")
-        print(f"   - Successfully benchmarked custom attention vs PyTorch")
-        print(f"   - Demonstrated performance analysis skills")
-        print(f"   - Generated publication-quality visualizations")
-        print(f"   - Validated implementation correctness")
-        
+
     except Exception as e:
         print(f"Error during benchmarking: {e}")
         print("Please check your PyTorch installation and GPU availability.")
