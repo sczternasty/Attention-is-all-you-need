@@ -1,26 +1,3 @@
-"""
-Attention-Based Image Inpainting on CIFAR-10
-
-CV-Ready Implementation: Advanced Computer Vision with Attention Mechanisms
-=========================================================================
-
-This module demonstrates cutting-edge machine learning skills by implementing:
-- Custom self-attention mechanisms for image inpainting
-- Transformer-based architectures for computer vision tasks
-- Multi-head attention with spatial understanding
-- Advanced image processing on complex datasets (CIFAR-10)
-
-Key Technical Skills Demonstrated:
-- Deep understanding of attention mechanisms in computer vision
-- Custom transformer architecture design and implementation
-- Advanced PyTorch skills for complex neural networks
-- Research-level implementation of attention-based image processing
-
-CV Category: Computer Vision, Attention Mechanisms, Transformer Architecture, Image Inpainting
-Author: [Your Name]
-Date: [Current Date]
-"""
-
 import torch
 import torch.nn as nn
 import torchvision.datasets as datasets
@@ -31,8 +8,6 @@ import torch.nn.functional as F
 import random
 import matplotlib.pyplot as plt
 
-# CV Skill: Advanced Data Pipeline & Preprocessing
-# Complex dataset handling with proper normalization and augmentation
 transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
@@ -45,14 +20,7 @@ train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=64)
 
 def remove_random_patches(images, patch_size=8):
-    """
-    CV Skill: Advanced Image Processing & Data Augmentation
-    - Custom patch removal for complex image datasets
-    - Efficient tensor manipulation and position tracking
-    - Mask generation for supervised learning with position awareness
-    
-    Creates training data by randomly removing patches while tracking positions.
-    """
+
     B, C, H, W = images.size()
     images = images.clone()
     mask = torch.ones_like(images)

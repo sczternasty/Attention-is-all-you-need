@@ -1,26 +1,3 @@
-"""
-IMDB Sentiment Analysis using Custom Self-Attention Mechanisms
-
-CV-Ready Implementation: Advanced NLP with Custom Attention Architectures
-=======================================================================
-
-This module demonstrates advanced machine learning skills by implementing:
-- Custom self-attention mechanisms from scratch for sentiment analysis
-- Multi-head attention with configurable dimensions and heads
-- Efficient batching strategies for variable-length sequences
-- Custom training loops with comprehensive evaluation metrics
-
-Key Technical Skills Demonstrated:
-- Deep understanding of transformer architectures and attention mechanisms
-- Advanced PyTorch implementation without relying on pre-built libraries
-- Custom neural network design and optimization
-- Research-level implementation of state-of-the-art NLP techniques
-
-Author: [Your Name]
-Date: [Current Date]
-CV Category: Natural Language Processing, Sentiment Analysis, Custom Attention Implementation
-"""
-
 import torch
 import torch.nn as nn
 from data_download import load_imdb
@@ -28,44 +5,15 @@ import matplotlib.pyplot as plt
 import torch.nn.functional as F
 import fire
 
-# Set random seed for reproducibility
 torch.manual_seed(42)
 
 def load_data(max_token=None):
-    """
-    Load and preprocess IMDB dataset for sentiment analysis.
-    
-    CV Skill: Data Pipeline Development & Preprocessing
-    - Efficient data loading and batching strategies
-    - Dynamic padding for variable-length sequences
-    - Vocabulary management and tokenization
-    
-    Args:
-        max_token (int, optional): Maximum number of tokens per batch. 
-                                 If None, uses the maximum sequence length.
-    
-    Returns:
-        tuple: ((train_X, train_y), (val_X, val_y), vocab_size)
-               - train_X: Training data batches
-               - train_y: Training labels
-               - val_X: Validation data batches  
-               - val_y: Validation labels
-               - vocab_size: Size of vocabulary
-    """
     (x_train, y_train), (x_val, y_val), (i2w, w2i), numcls = load_imdb(final=False)
     train_X, train_y = batchify(x_train, y_train, w2i, max_token)
     val_X, val_y = batchify(x_val, y_val, w2i, max_token)
     return (train_X, train_y), (val_X, val_y), len(w2i)
 
 def batchify(X, y, w2i, max_token=None):
-    """
-    CV Skill: Advanced Batching & Memory Optimization
-    - Custom batching strategy for variable-length sequences
-    - Memory-efficient token management
-    - Dynamic padding implementation
-    
-    Creates efficient batches while respecting token limits and memory constraints.
-    """
 
     if not max_token:
         max_token = max([len(x) for x in X])
@@ -129,19 +77,7 @@ def plot_loss(trainlosses, testlosses=None, labels = None):
     plt.show()
 
 class SimpleSelfAttention(nn.Module):
-    """
-    Simple Self-Attention model for text classification.
-    
-    This model implements a basic self-attention mechanism where:
-    1. Input tokens are embedded into a k-dimensional space
-    2. Self-attention weights are computed using dot-product attention
-    3. Global pooling is applied to aggregate sequence information
-    4. Final classification is performed using a linear layer
-    
-    Args:
-        vocab_size (int): Size of the vocabulary
-        k (int): Embedding dimension and hidden size
-    """
+
     
     def __init__(self, vocab_size, k):
         super().__init__()
@@ -150,27 +86,17 @@ class SimpleSelfAttention(nn.Module):
         self.fc = nn.Linear(k, 2)
     
     def forward(self, x):
-        """
-        Forward pass through the self-attention model.
-        
-        Args:
-            x (torch.Tensor): Input tensor of shape (batch_size, seq_len)
-        
-        Returns:
-            torch.Tensor: Output logits of shape (batch_size, 2)
-        """
+
         # x size = (batch_size, seq_len)
         x = self.emb(x)  # x size = (batch_size, seq_len, k)
         
-        # Compute self-attention weights
+
         raw_weights = torch.bmm(x, x.transpose(1, 2))
         weights = F.softmax(raw_weights, dim=2)
-        
-        # Apply attention weights
+
         x = torch.bmm(weights, x)
         x = x.transpose(1, 2)  # x size = (batch_size, k, seq_len)
-        
-        # Global pooling and classification
+
         x = self.global_pool(x)  # x size = (batch_size, k, 1)
         x = x.squeeze(2)  # x size = (batch_size, k)
         x = self.fc(x)  # x size = (batch_size, 2)

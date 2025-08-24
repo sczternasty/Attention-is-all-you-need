@@ -1,25 +1,3 @@
-"""
-Wiki Text Generation using Custom Self-Attention Mechanisms
-
-CV-Ready Implementation: Advanced NLP with Text Generation & Language Modeling
-============================================================================
-
-This module demonstrates cutting-edge natural language processing skills by implementing:
-- Custom self-attention mechanisms for text generation
-- Advanced language modeling with compression metrics
-- Efficient sequence processing for large-scale datasets
-- Custom training loops with sophisticated evaluation
-
-Key Technical Skills Demonstrated:
-- Deep understanding of transformer architectures and attention mechanisms
-- Advanced text generation and language modeling techniques
-- Custom PyTorch implementation for complex NLP tasks
-- Research-level implementation of state-of-the-art text generation
-
-CV Category: Natural Language Processing, Text Generation, Language Modeling, Custom Attention
-Author: [Your Name]
-Date: [Current Date]
-"""
 
 import torch
 import torch.nn as nn
@@ -33,26 +11,10 @@ import numpy as np
 import gzip
 from torch.optim.lr_scheduler import LambdaLR
 
-# CV Skill: Reproducible Research & Experimentation
 torch.manual_seed(42)
 
 def enwik8(path=None, n_train=int(90e6), n_valid=int(5e6), n_test=int(5e6)):
-    """
-    CV Skill: Advanced Data Pipeline & Large-Scale Dataset Handling
-    - Efficient loading of large-scale text datasets
-    - Memory-optimized data processing
-    - Custom dataset splitting and management
-    
-    Load the enwik8 dataset from the Hutter challenge for language modeling.
 
-    Adapted from https://github.com/openai/blocksparse/blob/master/examples/transformer/enwik8.py
-
-    :param path:
-    :param n_train:
-    :param n_valid:
-    :param n_test:
-    :return:
-    """
     cwd = os.getcwd()
     if path is None:
         path = cwd + '\\data\\enwik8.gz'
@@ -64,42 +26,20 @@ def enwik8(path=None, n_train=int(90e6), n_valid=int(5e6), n_test=int(5e6)):
 
 def compute_compression(model, data, context, batch_size, verbose=False, tok=None, skip=0, device='cpu'):
 
-
-    """
-    Compute the _compression_ of a dataset under a model. That is, given a model, in how many bits could we represent
-    the dataset. This requires us to turn a given probability distribution into a code for the outcomes.
-
-    See [this video](https://youtu.be/mSneVjDvzNQ) for an explanation.
-
-    :param model: A sequence-to-sequence model that takes as input a (sub) sequence of integers and produces a probability
-    distributuion on the output.
-    :param data: A singe list of integers representing the  data
-    :return: The result of the computation in "bits per byte". That is, how many bits does the compressed representation
-    spend on each byte (=ASCII character) of the raw data.
-    """
     LOG2E = math.log2(math.e)
     LOGE2 = math.log(2.0)
     bits, tot = 0.0, 0
     batch = []
-    # Buffer, every time it fills up, we run it through the model
-    # --- For the sake of speed we want to process the data in batches. For each token in the data, we make a
-    #     prediction based on all the `context` tokens before it. This means that for each subsequence in the batch, we
-    #     need to shift the start/end indices ahead by one token.
-    #
-    #     After we pass the batch through the model, we look at only the probabilities predicted for the last token.
 
     target_indices = []
     i, ic = 0, 0
 
     for current in tqdm.trange(skip, data.size(0)) if verbose else range(skip, data.size(0)):
 
-        # `current` is the character which we will ultimately predict
-
         fr = max(0, current - context)
         to = current + 1
 
         instance = data[fr:to].to(torch.long) # the subsequence of the data to add to the batch
-        # -- slice out an instance of size context + 1 (or shorter at the start of the data)
 
         # if tok is not None:
         #     print(instance[:-1], tok.decode(instance[:-1]))
@@ -108,25 +48,22 @@ def compute_compression(model, data, context, batch_size, verbose=False, tok=Non
         target_indices.append(instance.size(0) - 2) # index of the last element of the input to the model
 
         if instance.size(0) < context + 1:
-            assert skip < context # We shouldn't get here if we skip the first `context` characters
-
-            # the index in the output tensor of the character we want to predict
-            # -- It's context + 1, because we clip off the last token as a target
+            assert skip < context
 
             pad = torch.zeros(size=(context + 1 - instance.size(0),), dtype=torch.long)
             instance = torch.cat([instance, pad], dim=0)
-            # -- the first tokens don't have enough tokens preceding them, so we pad them to the right size.
 
-            assert instance.size(0) == context + 1 # all instances should be `context` + 1 long
+
+            assert instance.size(0) == context + 1
 
         if torch.cuda.is_available():
             instance = instance.cuda()
 
         batch.append(instance[None, :])
-        # -- We add a singleton dimension to concatenate along later.
+
 
         if len(batch) == batch_size or current == data.size(0) - 1:
-            # batch is full or we are at the last instance, run it through the model
+
 
             b = len(batch)
 
@@ -147,13 +84,12 @@ def compute_compression(model, data, context, batch_size, verbose=False, tok=Non
 
             lnprobs = output[torch.arange(b, device=device), target_indices, target]
             log2probs = lnprobs / LOGE2
-            # -- The model produces natural logarithms of probabilities, but we need base-2 logarithms of the
-            #    probabilities, since these give us bits.
 
 
 
-            bits += - log2probs.sum() # Add the bits for each character (the negative log_2 probabilities) to the running total
-            batch, target_indices = [], []  # clear the buffer
+
+            bits += - log2probs.sum()
+            batch, target_indices = [], []
 
     if isinstance(bits, torch.Tensor):
         bits = bits.item()
@@ -216,7 +152,7 @@ class SelfAttention(nn.Module):
         out = out.transpose(1, 2).contiguous().view(B, T, S * H) # (B, H, T, S) -> (B, T, S * H) -> (B, T, C)
 
         out = self.unify_heads(out)
-        [[]]
+
         return out
 
 class TransformerBlock(nn.Module):
@@ -246,16 +182,16 @@ class Transformer(nn.Module):
         self.emb_size = emb_size
         self.heads = heads
 
-        # Embeddings
+
         self.emb = nn.Embedding(vocab_size, emb_size)
         self.pos_emb = nn.Embedding(seq_length, emb_size)
         
-        # Dropout layers
+
         self.emb_dropout = nn.Dropout(dropout)
         self.pos_dropout = nn.Dropout(dropout)
         self.final_dropout = nn.Dropout(dropout)
 
-        # Transformer blocks with dropout parameter
+
         self.transformer_blocks = nn.ModuleList(
             [TransformerBlock(emb_size, heads, dropout=dropout) for _ in range(num_layers)]
         )
