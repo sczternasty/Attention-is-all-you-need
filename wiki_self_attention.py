@@ -26,7 +26,6 @@ def enwik8(path=None, n_train=int(90e6), n_valid=int(5e6), n_test=int(5e6)):
 
 def compute_compression(model, data, context, batch_size, verbose=False, tok=None, skip=0, device='cpu'):
 
-    LOG2E = math.log2(math.e)
     LOGE2 = math.log(2.0)
     bits, tot = 0.0, 0
     batch = []
@@ -39,13 +38,13 @@ def compute_compression(model, data, context, batch_size, verbose=False, tok=Non
         fr = max(0, current - context)
         to = current + 1
 
-        instance = data[fr:to].to(torch.long) # the subsequence of the data to add to the batch
+        instance = data[fr:to].to(torch.long)
 
         # if tok is not None:
         #     print(instance[:-1], tok.decode(instance[:-1]))
         #     print(instance[-1:], tok.decode(instance[-1:]))
 
-        target_indices.append(instance.size(0) - 2) # index of the last element of the input to the model
+        target_indices.append(instance.size(0) - 2)
 
         if instance.size(0) < context + 1:
             assert skip < context
@@ -70,7 +69,7 @@ def compute_compression(model, data, context, batch_size, verbose=False, tok=Non
             ti = torch.tensor(target_indices) + 1
             all = torch.cat(batch, dim=0)
             inputs = all[:, :-1] # input
-            target = all[torch.arange(b), ti]  # target values
+            target = all[torch.arange(b), ti]
 
             with torch.no_grad():
                 if next(model.parameters()).is_cuda:
@@ -78,7 +77,7 @@ def compute_compression(model, data, context, batch_size, verbose=False, tok=Non
                 output = model(inputs)
 
             if type(output) != torch.Tensor:
-                output = torch.log_softmax(output.logits, dim=2) # To make the method work for GPT2 models from Huggingface
+                output = torch.log_softmax(output.logits, dim=2)
 
             assert output.size()[:2] == (b, context), f'was: {output.size()}, should be {(b, context, -1)}'
 
